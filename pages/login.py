@@ -1,5 +1,3 @@
-# pages/login.py
-
 import streamlit as st
 import requests
 
@@ -8,17 +6,25 @@ BASE_URL = "http://localhost:8000"  # Replace with your FastAPI server address
 
 def login_user(username, password):
     data = {"username": username, "password": password}
-    response = requests.post(f"{BASE_URL}/auth/login/", json=data)
-    return response.json()
+    return requests.post(f"{BASE_URL}/auth/login/", params=data)
 
 
 def login_main():
-    st.title("Login")
-    login_username = st.text_input("Username")
-    login_password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        if login_username and login_password:
-            response = login_user(login_username, login_password)
-            st.success(response["message"])
+    st.title("User Login")
 
-login_main()
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if not username or not password:
+            st.error("Please enter both username and password.")
+        else:
+            response = login_user(username, password)
+            if response.status_code == 200:
+                st.success("Login successful!")
+            else:
+                st.error("Invalid credentials. Please try again.")
+
+
+if __name__ == "__main__":
+    login_main()

@@ -1,7 +1,7 @@
 # app/routes/auth.py
 
 from fastapi import APIRouter, HTTPException, Depends
-from app.database import get_db_connection
+from app.database import get_db_connection, get_hashed_password_from_db
 from app.models import User
 from app.utils.authentication import get_password_hash
 
@@ -30,3 +30,11 @@ def register(username: str, password: str, db=Depends(get_db_connection)):
     cursor.close()
 
     return {"message": "User registered successfully"}
+
+
+@router.post("/login/")
+def login(username: str, password: str):
+    hashed_password_from_db = get_hashed_password_from_db(username)
+    if hashed_password_from_db == get_password_hash(password):
+        return {"message": "Login successful!"}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
