@@ -1,4 +1,4 @@
-# pages/registration.py
+# pages/2_registration.py
 
 import streamlit as st
 import requests
