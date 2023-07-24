@@ -1,20 +1,32 @@
 # app/routes/auth.py
 
 from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
-from ..models import User
-from ..utils.authentication import get_password_hash
-from ..database import get_db
+from app.database import get_db_connection
+from app.models import User
+from app.utils.authentication import get_password_hash
 
 router = APIRouter()
 
-@router.post("/register/", response_model=User)
-def register(username: str, password: str, db: Session = Depends(get_db)):
-    hashed_password = get_password_hash(password)
-    user = User(username=username, password=hashed_password)
 
-    # Save the user to the database
-    db.add(user)
+@router.post("/register/")
+def register(username: str, password: str, db=Depends(get_db_connection)):
+    # Check if the user already exists
+    cursor = db.cursor()
+    cursor.execute("SELECT 1 FROM users WHERE username = %s", (username,))
+    user_exists = cursor.fetchone()
+
+    if user_exists:
+        raise HTTPException(status_code=400, detail="Username already exists")
+
+    # Create a new user instance
+    user = User(username=username, password=get_password_hash(password))
+
+    # Save the user to PostgreSQL
+    insert_query = "INSERT INTO users (username, password) VALUES (%s, %s)"
+    values = (user.username, user.password)
+    cursor.execute(insert_query, values)
+
     db.commit()
-    db.refresh(user)
-    return user
+    cursor.close()
+
+    return {"message": "User registered successfully"}

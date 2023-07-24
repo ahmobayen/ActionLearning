@@ -8,7 +8,7 @@ from ..utils.authentication import verify_password
 
 router = APIRouter()
 
-@router.post("/login/")
+@router.post("/auth/login/")
 def login(username: str, password: str):
     # Here, you can implement your database logic to retrieve the user.
     # For this example, we'll just check the credentials and return a message.

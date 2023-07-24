@@ -1,19 +1,20 @@
-# app/database.py
+# database.py
 
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import psycopg2
 
-SQLALCHEMY_DATABASE_URL = 'postgresql://ahmobayen:85hSGYVTLHZf@ep-green-salad-117547.eu-central-1.aws.neon.tech/neondb'
+# Replace these values with your actual PostgreSQL database credentials
+DB_NAME = "neondb"
+DB_USER = "ahmobayen"
+DB_PASSWORD = "85hSGYVTLHZf"
+DB_HOST = "ep-green-salad-117547.eu-central-1.aws.neon.tech"
+DB_PORT = "5432"
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+def get_db_connection():
+    return psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT
+    )

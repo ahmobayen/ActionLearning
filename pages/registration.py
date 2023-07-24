@@ -8,17 +8,25 @@ BASE_URL = "http://localhost:8000"  # Replace with your FastAPI server address
 
 def register_user(username, password):
     data = {"username": username, "password": password}
-    response = requests.post(f"{BASE_URL}/auth/register/", json=data)
-    return response.json()
+    return requests.post(f"{BASE_URL}/auth/register/", params=data)
 
 
 def registration_main():
-    st.title("Registration")
-    reg_username = st.text_input("Username")
-    reg_password = st.text_input("Password", type="password")
+    st.title("User Registration")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
     if st.button("Register"):
-        if reg_username and reg_password:
-            response = register_user(reg_username, reg_password)
-            st.success(f"Registered user: {response['username']}")
+        if not username or not password:
+            st.error("Please enter both username and password.")
+        else:
+            response = register_user(username, password)
+            if response.status_code == 200:
+                st.success(f"Username {username} Successfully Registered")
+            elif response.status_code == 400:
+                st.error("Username already exists.")
+            else:
+                st.error("Registration failed. Please try again later.")
 
 registration_main()
