@@ -28,5 +28,6 @@ def registration_main():
                 st.error("Username already exists.")
             else:
                 st.error("Registration failed. Please try again later.")
-
+    
+    if __name__ == "__main__":
 registration_main()

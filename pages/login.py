@@ -1,30 +1,66 @@
 import streamlit as st
 import requests
 
-BASE_URL = "http://localhost:8000"  # Replace with your FastAPI server address
+BASE_URL = "http://localhost:8000"  
 
+def main():
+    st.title("Welcome to stockmarket")
 
-def login_user(username, password):
-    data = {"username": username, "password": password}
-    return requests.post(f"{BASE_URL}/auth/login/", params=data)
+    page = st.sidebar.selectbox("Page", ["Sign up", "Login"])
 
+    if page == "Sign up":
+        signup_page()
+    elif page == "Login":
+        login_page()
 
-def login_main():
-    st.title("User Login")
-
-    username = st.text_input("Username")
+def signup_page():
+    st.header("Sign up")
+    Fname = st.text_input("First Name")
+    Lname = st.text_input("Last Name")
+    email = st.text_input("Email")
     password = st.text_input("Password", type="password")
+    DOB = st.date_input("DOB")
+
+    if st.button("Sign up"):
+        data = {
+            "First name": Fname,
+            "Last name": Lname,
+            "DOB": DOB,
+            "email": email,
+            "password": password
+        }
+
+        response = requests.post(f"{BASE_URL}/signup", json=data)
+        if response.status_code == 200:
+            result = response.json()
+            if result["status"] == "user_exists":
+                st.warning("User already exists. Please go to the Login page.")
+                st.sidebar.selectbox("Page", ["Login"])
+            else:
+                st.success("Signup successful.")
+        else:
+            st.error("Signup failed.")
+
+def login_page():
+    st.header("Login")
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+ 
 
     if st.button("Login"):
-        if not username or not password:
-            st.error("Please enter both username and password.")
-        else:
-            response = login_user(username, password)
-            if response.status_code == 200:
-                st.success("Login successful!")
-            else:
-                st.error("Invalid credentials. Please try again.")
+        # Prepare data for prediction
+        data = {
+            "email": email,
+            "password": password
+        }
 
+        # Make prediction API call
+        response = requests.post(f"{BASE_URL}/Login", json=data)
+        if response.status_code == 200:
+            result = response.json()
+            # Handle the login response here (e.g., redirect to a new page or show a success message)
+        else:
+            st.error("Login failed.")
 
 if __name__ == "__main__":
-    login_main()
+    main()
