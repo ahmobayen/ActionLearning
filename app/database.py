@@ -48,3 +48,13 @@ def get_hashed_password_from_db(username: str):
         # Close the database connection and cursor when done
         cursor.close()
         connection.close()
+
+
+def get_all_predictions():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    query = "SELECT stock_code, prediction_date, predicted_value, predicted_date FROM predictions;"
+    cursor.execute(query)
+    predictions = cursor.fetchall()
+    cursor.close()
+    return predictions
