@@ -2,7 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import altair as alt
-
+import finnhub
 
 def get_stock_data(stock_code, start_date, end_date):
     stock_data = yf.download(stock_code, start=start_date, end=end_date)
@@ -27,7 +27,11 @@ def calculate_daily_changes(combined_data):
     # Drop the first row since it will have NaN values
     daily_changes.dropna(inplace=True)
 
+    # Set 'Date' as the index again to avoid it being included in the mean calculation
+    daily_changes.set_index('Date', inplace=True)
+
     return daily_changes
+
 
 
 def calculate_roi(stock_data):
@@ -53,7 +57,7 @@ def calculate_dividend_yield(stock_code, start_date, end_date):
 
 
 def main():
-    st.title("Stock Comparison App")
+    st.title("Stock Comparison")
 
     # Set up the sidebar layout
     st.sidebar.title("User Inputs")
@@ -115,14 +119,21 @@ def main():
     combined_data.columns = [stock_name_1, stock_name_2, stock_name_3]
     combined_data.reset_index(inplace=True)  # Reset index to keep Date as a separate column
 
-    # Calculate daily percentage changes for each stock
-    daily_changes = calculate_daily_changes(combined_data)
-
     # Calculate average daily changes for each stock
-    avg_daily_changes = daily_changes.mean()
+    avg_daily_changes = calculate_daily_changes(combined_data).mean()
 
-    # Drop the 'Date' column from daily changes as it's not needed for the table
-    daily_changes.drop(columns='Date', inplace=True)
+    # Calculate the overall average daily change for all stocks
+    overall_avg_daily_change = avg_daily_changes.mean()
+
+    # Create a DataFrame to display the average daily changes
+    avg_daily_changes_df = pd.DataFrame({'Average Daily Change (%)': avg_daily_changes.round(2)})
+
+    # Add a row for the overall average daily change
+    avg_daily_changes_df.loc['Overall'] = overall_avg_daily_change.round(2)
+
+    # Display the average daily changes in a table
+    st.subheader("Average Daily Changes (%)")
+    st.table(avg_daily_changes_df)
 
     # Calculate ROI for each stock
     roi_1 = calculate_roi(stock_data_1)
@@ -137,6 +148,7 @@ def main():
         color='Company:N'
     ).interactive()
     st.altair_chart(chart, use_container_width=True)
+
 
     # Display the average daily changes in a table
     st.subheader("Average Daily Changes (%)")
