@@ -1,8 +1,8 @@
 import streamlit as st
 import finnhub
-import yfinance as yf
+
 import datetime
-from Sentiment_analysis import get_sentiment_scores, get_sentiment_label, perform_ner
+from pages.utils.Sentiment_analysis import get_sentiment_scores, get_sentiment_label
 
 # Replace YOUR_API_KEY with your actual Finnhub API key
 finnhub_client = finnhub.Client(api_key="cj16eq1r01qhv0uhjss0cj16eq1r01qhv0uhjssg")
@@ -10,6 +10,7 @@ finnhub_client = finnhub.Client(api_key="cj16eq1r01qhv0uhjss0cj16eq1r01qhv0uhjss
 
 def convert_unix_to_datetime(unix_time):
     return datetime.datetime.utcfromtimestamp(unix_time).strftime('%Y-%m-%d %H:%M:%S')
+
 
 def get_company_news(stock_code, start_date, end_date):
     raw_news = finnhub_client.company_news(stock_code, _from=start_date, to=end_date)
@@ -24,6 +25,7 @@ def get_company_news(stock_code, start_date, end_date):
             item['Positive'] = sentiment_scores[2]
         return filtered_news
     return None
+
 
 def main():
     st.title("FinS - Financial news with Sentiment Analysis ")
@@ -45,16 +47,16 @@ def main():
                 import pandas as pd
                 df = pd.DataFrame(news)
                 df['datetime'] = pd.to_datetime(df['datetime'])
-                sentiment_labels = df.apply(lambda row: get_sentiment_label([row['Negative'], row['Neutral'], row['Positive']]), axis=1)
+                sentiment_labels = df.apply(
+                    lambda row: get_sentiment_label([row['Negative'], row['Neutral'], row['Positive']]), axis=1)
                 df['Sentiment'] = sentiment_labels
                 df['Negative'] = df['Negative'].apply(lambda score: f"{score:.2%}")
                 df['Neutral'] = df['Neutral'].apply(lambda score: f"{score:.2%}")
                 df['Positive'] = df['Positive'].apply(lambda score: f"{score:.2%}")
 
-
-
                 # Display the news table with clickable links
-                st.dataframe(df[['datetime', 'headline', 'Sentiment', 'Negative', 'Neutral', 'Positive', 'related', 'source', 'summary', 'url']], height=600)
+                st.dataframe(df[['datetime', 'headline', 'Sentiment', 'Negative', 'Neutral', 'Positive', 'related',
+                                 'source', 'summary', 'url']], height=600)
             else:
                 st.error("No news found for the given stock and date range.")
 

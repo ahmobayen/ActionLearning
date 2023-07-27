@@ -1,7 +1,7 @@
 import datetime
 
 import streamlit as st
-from app.utils.modeling import get_data, make_prediction
+from app.utils.modeling import get_data, make_prediction, make_prediction_2
 from pages.utils.charts import *
 
 st.set_page_config(page_title='Prediction', page_icon='📈', layout='wide')
@@ -28,12 +28,16 @@ st.plotly_chart(candle_bar(data), use_container_width=True)
 
 st.subheader('Predict Data')
 
-predict_col1, predict_col2 = st.columns([3, 1])
-with predict_col1:
-    result = make_prediction(data, 'bidirectional_LSTM')
+# predict_col1, predict_col2 = st.columns([3, 1])
+# with predict_col1:
+#     result = make_prediction(data, 'bidirectional_LSTM')
+#
+#     original = get_data(ticker[option], start_date=str(result.iloc[0, 0])[0:10], end_date=str(result.iloc[-1, 0])[0:10])
+#     st.plotly_chart(prediction_chart(prediction_data=result, original_data= original), use_container_width=True)
+#
+# with predict_col2:
+#     st.dataframe(result.iloc[-10:,:])
 
-    original = get_data(ticker[option], start_date=str(result.iloc[0, 0])[0:10], end_date=str(result.iloc[-1, 0])[0:10])
-    st.plotly_chart(prediction_chart(prediction_data=result, original_data= original), use_container_width=True)
 
-with predict_col2:
-    st.dataframe(result.iloc[-10:,:])
+fig = make_prediction_2(ticker[option], start_date=start_date, end_date=end_date)
+st.plotly_chart(fig, use_container_width=True)

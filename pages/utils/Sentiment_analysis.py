@@ -9,7 +9,8 @@ model = BertForSequenceClassification.from_pretrained("yiyanghkust/finbert-tone"
 tokenizer = BertTokenizer.from_pretrained("yiyanghkust/finbert-tone")
 
 # Load the NER model
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load('en_core_web_lg')
+
 
 # Function to get the sentiment scores
 def get_sentiment_scores(text):
