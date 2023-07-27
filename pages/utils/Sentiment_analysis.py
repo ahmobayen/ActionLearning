@@ -20,6 +20,7 @@ def get_sentiment_scores(text):
     probabilities = torch.softmax(logits, dim=1).tolist()[0]
     return probabilities
 
+
 # Function to get the sentiment label
 def get_sentiment_label(sentiment_scores):
     max_score_index = sentiment_scores.index(max(sentiment_scores))
@@ -29,6 +30,7 @@ def get_sentiment_label(sentiment_scores):
         return "Neutral"
     else:
         return "Positive"
+
 
 # Function to get the stock codes from company names using yfinance
 def get_stock_codes(company_names):
@@ -45,6 +47,7 @@ def get_stock_codes(company_names):
 
     return stock_codes
 
+
 # Function to perform Named Entity Recognition
 def perform_ner(text):
     doc = nlp(text)
@@ -53,8 +56,10 @@ def perform_ner(text):
         if ent.label_ == "ORG":
             company_names.append(ent.text)
     return company_names
+
+
 # Streamlit app
-def main():
+def sentiment_analysis_main():
     st.title("Financial News Sentiment Analysis")
 
     st.write("Kindly provide text for analysis:")
@@ -85,4 +90,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sentiment_analysis_main()
